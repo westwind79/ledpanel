@@ -54,7 +54,6 @@ void fun1() {
     effectDelay = 0;
     FastLED.clear();
     // selectRandomPalette();
-   // CRGBPalette16 targetPalette(PartyColors_p);
     fadingActive = true;
   }
   static int wave1 = 1;                                                // Current phase is calculated.
@@ -113,7 +112,6 @@ void starfield() {
     effectDelay = 0;
     FastLED.clear();
     // selectRandomPalette();
-   // CRGBPalette16 targetPalette(PartyColors_p);
     fadingActive = true;
   }
   CRGB brightnessSubtractor;
@@ -166,6 +164,7 @@ void rainbowStripes() {
     DrawOneFrame( ms / 65536, yHueDelta32 / 32768, xHueDelta32 / 32768);
     FastLED.show();
 }
+
 void radiate() {
    if (effectInit == false) {
     effectInit = true;
@@ -242,7 +241,7 @@ void colorFill() {
   }
   
   if (!(currentDirection & 1)) {
-    effectDelay = 20; // slower since vertical has fewer pixels
+    effectDelay = 40; // slower since vertical has fewer pixels
     for (byte x = 0; x < kMatrixWidth; x++) {
       byte y = currentRow;
       if (currentDirection == 2) y = kMatrixHeight - 1 - currentRow;
@@ -315,55 +314,6 @@ void Fire2012WithPalette() {
     }
   }
 }
-// void Fire2012WithPalette() {
-
-//   bool gReverseDirection = false;
-
-//   // Array of temperature readings at each simulation cell
-//   static byte heat[kMatrixWidth];
-
-//   CRGBPalette16 gPal;
-//   gPal = HeatColors_p;
-
-  
-//   if (effectInit == false) {
-//     effectInit = true;
-//     FastLED.clear(); 
-//     effectDelay = 0;
-//     fadingActive = true;
-//   }
-
-//   // Step 1.  Cool down every cell a little
-//   for( int i = 0; i < kMatrixWidth; i++) {
-//     heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / kMatrixHeight) + 2));
-//   }
-
-//   // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-//   for( int k = kMatrixWidth - 1; k >= 2; k--) {
-//     heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
-//   }
-
-//   // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
-//   if( random8() < SPARKING ) {
-//     int y = random8(2);
-//     heat[y] = qadd8( heat[y], random8(160, 255) );
-//   }
-
-//   for( int x = 0; x < kMatrixWidth; x++) {
-//     // Step 4.  Map from heat cells to LED colors
-//     for( int j = 0; j < kMatrixHeight; j++) {
-//       // Scale the heat value from 0-255 down to 0-240
-//       // for best results with color palettes.
-//       byte colorindex = scale8( heat[j], 240);
-//       CRGB color = ColorFromPalette( gPal, colorindex);
-//       int pixelnumber;
-       
-//       pixelnumber = j;
-       
-//       leds[XY(x,pixelnumber)] = color;
-//     }
-//   }
-// }
 
 void snow() {
 
@@ -1077,4 +1027,178 @@ void overcastSky() {
 
   FastLED.setTemperature( TEMPERATURE_2 ); // second temperature
   leds[0] = TEMPERATURE_2; // show indicator pixel
+}
+
+
+#define NORMAL 0
+#define RAINBOW 1
+#define charSpacing 2
+// Scroll a text string
+void scrollText(byte message, byte style, CRGB fgColor, CRGB bgColor) {
+  static byte currentMessageChar = 0;
+  static byte currentCharColumn = 0;
+  static byte paletteCycle = 0;
+  static CRGB currentColor;
+  static byte bitBuffer[16] = {0};
+  static byte bitBufferPointer = 0;
+
+
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 35;
+    currentMessageChar = 0;
+    currentCharColumn = 0;
+    selectFlashString(message);
+    loadCharBuffer(loadStringChar(message, currentMessageChar));
+    currentPalette = RainbowColors_p;
+    for (byte i = 0; i < kMatrixHeight; i++) bitBuffer[i] = 0;
+  }
+
+
+  paletteCycle += 15;
+
+  if (currentCharColumn < 5) { // characters are 5 pixels wide
+    bitBuffer[(bitBufferPointer + kMatrixHeight - 1) % kMatrixHeight] = charBuffer[currentCharColumn]; // character
+  } else {
+    bitBuffer[(bitBufferPointer + kMatrixHeight - 1) % kMatrixHeight] = 0; // space
+  }
+
+  CRGB pixelColor;
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    for (byte y = 0; y < 5; y++) { // characters are 5 pixels tall
+      if (bitRead(bitBuffer[(bitBufferPointer + x) % kMatrixWidth], y) == 1) {
+        if (style == RAINBOW) {
+          pixelColor = ColorFromPalette(currentPalette, paletteCycle+y*16, 255);
+        } else {
+          pixelColor = fgColor;
+        }
+      } else {
+        pixelColor = bgColor;
+      }
+      leds[XY(x, y)] = pixelColor;
+    }
+  }
+
+  currentCharColumn++;
+  if (currentCharColumn > (4 + charSpacing)) {
+    currentCharColumn = 0;
+    currentMessageChar++;
+    char nextChar = loadStringChar(message, currentMessageChar);
+    if (nextChar == 0) { // null character at end of strong
+      currentMessageChar = 0;
+      nextChar = loadStringChar(message, currentMessageChar);
+    }
+    loadCharBuffer(nextChar);
+  }
+
+  bitBufferPointer++;
+  if (bitBufferPointer > 15) bitBufferPointer = 0;
+
+}
+
+
+void scrollTextZero() {
+  scrollText(0, NORMAL, CRGB::Red, CRGB::Black);
+}
+
+void scrollTextOne() {
+  scrollText(1, RAINBOW, 0, CRGB::Black);
+}
+
+void scrollTextTwo() {
+  scrollText(2, NORMAL, CRGB::Green, CRGB(0,0,8));
+}
+
+
+// ColorWavesWithPalettes
+// Animated shifting color waves, with several cross-fading color palettes.
+// by Mark Kriegsman, August 2015
+//
+// Color palettes courtesy of cpt-city and its contributors:
+//   http://soliton.vm.bytemark.co.uk/pub/cpt-city/
+//
+// Color palettes converted for FastLED using "PaletteKnife" v1:
+//   http://fastled.io/tools/paletteknife/
+//
+
+// ten seconds per color palette makes a good demo
+// 20-120 is better for deployment
+#define SECONDS_PER_PALETTE 10
+
+// Forward declarations of an array of cpt-city gradient palettes, and 
+// a count of how many there are.  The actual color palette definitions
+// are at the bottom of this file.
+extern const TProgmemRGBGradientPalettePtr gGradientPalettes[];
+extern const uint8_t gGradientPaletteCount;
+
+// Current palette number from the 'playlist' of color palettes
+uint8_t gCurrentPaletteNumber = 0;
+
+CRGBPalette16 gCurrentPalette( CRGB::Black);
+CRGBPalette16 gTargetPalette( gGradientPalettes[0] );
+
+// This function draws color waves with an ever-changing,
+// widely-varying set of parameters, using a color palette.
+void drawcolorwaves( CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette) {
+  static uint16_t sPseudotime = 0;
+  static uint16_t sLastMillis = 0;
+  static uint16_t sHue16 = 0;
+ 
+  uint8_t sat8 = beatsin88( 87, 220, 250);
+  uint8_t brightdepth = beatsin88( 341, 96, 224);
+  uint16_t brightnessthetainc16 = beatsin88( 203, (25 * 256), (40 * 256));
+  uint8_t msmultiplier = beatsin88(147, 23, 60);
+
+  uint16_t hue16 = sHue16;//gHue * 256;
+  uint16_t hueinc16 = beatsin88(113, 300, 1500);
+  
+  uint16_t ms = millis();
+  uint16_t deltams = ms - sLastMillis ;
+  sLastMillis  = ms;
+  sPseudotime += deltams * msmultiplier;
+  sHue16 += deltams * beatsin88( 400, 5,9);
+  uint16_t brightnesstheta16 = sPseudotime;
+  
+  for( uint16_t i = 0 ; i < numleds; i++) {
+    hue16 += hueinc16;
+    uint8_t hue8 = hue16 / 256;
+    uint16_t h16_128 = hue16 >> 7;
+    if( h16_128 & 0x100) {
+      hue8 = 255 - (h16_128 >> 1);
+    } else {
+      hue8 = h16_128 >> 1;
+    }
+
+    brightnesstheta16  += brightnessthetainc16;
+    uint16_t b16 = sin16( brightnesstheta16  ) + 32768;
+
+    uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
+    uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
+    bri8 += (255 - brightdepth);
+    
+    uint8_t index = hue8;
+    //index = triwave8( index);
+    index = scale8( index, 240);
+
+    CRGB newcolor = ColorFromPalette( palette, index, bri8);
+
+    uint16_t pixelnumber = i;
+    pixelnumber = (numleds-1) - pixelnumber;
+    
+    nblend( ledarray[pixelnumber], newcolor, 128);
+  }
+}
+
+void colorwaves() {
+  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
+    gCurrentPaletteNumber = addmod8( gCurrentPaletteNumber, 1, gGradientPaletteCount);
+    gTargetPalette = gGradientPalettes[ gCurrentPaletteNumber ];
+  }
+
+  EVERY_N_MILLISECONDS(40) {
+    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 16);
+  }
+  
+  drawcolorwaves( leds, NUM_LEDS, gCurrentPalette);
 }
