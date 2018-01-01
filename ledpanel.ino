@@ -1,24 +1,45 @@
-#include <FastLED.h>
 
+
+#define LED_PIN     6
+#define BRIGHTNESS  96
+// Global maximum brightness value, maximum 255
+#define MAXBRIGHTNESS 120
+#define STARTBRIGHTNESS 65
+
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+#define hueTime 6
+#define DELAY_PATTERNS 20
+#define EEPROMDELAY 2000
+
+#include <FastLED.h>
 #include <LEDMatrix.h>
+#include <EEPROM.h>
+#include "palettes.h"
+#include "messages.h"
+#include "font.h"
 
 #include "XYmap.h"
 #include "utils.h"
 
 #include "effects.h"
 
-#define LED_PIN     6
-#define BRIGHTNESS  96
-#define LED_TYPE    WS2812B
-#define COLOR_ORDER GRB
-#define hueTime 6
-#define DELAY_PATTERNS 20
 
 void setup() {
   delay(3000);
-  LEDS.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
-  LEDS.setBrightness(BRIGHTNESS);
+    // check to see if EEPROM has been used yet
+  // if so, load the stored settings
+  byte eepromWasWritten = EEPROM.read(0);
+  if (eepromWasWritten == 99) {
+    currentEffect = EEPROM.read(1);
+    autoCycle = EEPROM.read(2);
+    currentBrightness = EEPROM.read(3);
+  }
 
+
+  LEDS.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  //LEDS.setBrightness(STARTBRIGHTNESS);
+  FastLED.setBrightness( scale8(currentBrightness, MAXBRIGHTNESS) );
   // Also, RainbowColors_p, RainbowStripeColors_p, OceanColors_p, CloudColors_p, LavaColors_p, ForestColors_p, and PartyColors_p
   resetvars();
 
@@ -36,6 +57,11 @@ SimplePatternList gPatterns = {
   //  circnoise1,
   //  circnoise2,
  // fireworks,
+
+  // scrollTextZero,
+  // scrollTextOne,
+  // scrollTextTwo,
+  colorwaves,
   amazing,
   slantBars2,
   tungsten,
@@ -55,7 +81,6 @@ SimplePatternList gPatterns = {
   threeSine,
   ripple,
   serendipitous,
-  // twoSin,
   inoise8_fire,
   blendme,
   crazy2,
@@ -75,13 +100,12 @@ SimplePatternList gPatterns = {
 
 
 void loop() {
+  currentMillis = millis(); // save the current timer value
+
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
 
   // send the 'leds' array out to the actual LED strip
-  LEDS.show();
-  // insert a delay to keep the framerate modest
-  LEDS.delay(1000 / FRAMES_PER_SECOND);
 
   // do some periodic updates
   EVERY_N_MILLISECONDS( hueTime ) {
@@ -90,6 +114,14 @@ void loop() {
   EVERY_N_SECONDS( DELAY_PATTERNS ) {
     nextPattern();  // change patterns periodically
   }
+
+//  updateButtons();          // read, debounce, and process the buttons
+//  doButtons();              // perform actions based on button state
+  checkEEPROM();            // update the EEPROM if necessary
+  LEDS.show();
+  // insert a delay to keep the framerate modest
+  LEDS.delay(1000 / FRAMES_PER_SECOND);
+
 }
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
