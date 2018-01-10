@@ -1,16 +1,13 @@
-
-
 #define LED_PIN     6
-#define BRIGHTNESS  96
-// Global maximum brightness value, maximum 255
-#define MAXBRIGHTNESS 120
-#define STARTBRIGHTNESS 65
-
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
+
 #define hueTime 6
 #define DELAY_PATTERNS 20
 #define EEPROMDELAY 2000
+#define BRIGHTNESS  96 // Global maximum brightness value, maximum 255
+#define MAXBRIGHTNESS 200
+#define STARTBRIGHTNESS 65
 
 #include <FastLED.h>
 #include <LEDMatrix.h>
@@ -45,6 +42,7 @@ void setup() {
 
   X = Xorig;
   Y = Yorig;
+
     // Initialize our coordinates to some random values
   x = random16();
   y = random16();
@@ -54,24 +52,27 @@ void setup() {
 typedef void (*SimplePatternList[])();
 
 SimplePatternList gPatterns = {
-  //  circnoise1,
-  //  circnoise2,
+  
  // fireworks,
-
   // scrollTextZero,
   // scrollTextOne,
   // scrollTextTwo,
-  colorwaves,
+  barfight,
+  colorPortal, 
+  starfield,
+  rider,
+  radiate,
   amazing,
+  colorRotation,
+  slantBars3,
+  // colorwaves,
   slantBars2,
   tungsten,
   overcastSky,
   colorSnake,
   amazingNoise,
-  starfield,
   slantBars,
   radiate2,
-  rider,
   plasma2,
   snow,
   Fire2012WithPalette,
@@ -91,7 +92,6 @@ SimplePatternList gPatterns = {
   colorFill,
   drip,
   sinelon,
-  radiate,
   rainbowStripes,
   fun1,
   rain,
@@ -104,8 +104,6 @@ void loop() {
 
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
-
-  // send the 'leds' array out to the actual LED strip
 
   // do some periodic updates
   EVERY_N_MILLISECONDS( hueTime ) {
@@ -120,7 +118,8 @@ void loop() {
   checkEEPROM();            // update the EEPROM if necessary
   LEDS.show();
   // insert a delay to keep the framerate modest
-  LEDS.delay(1000 / FRAMES_PER_SECOND);
+  // removed and it sped up the animations ??
+//  LEDS.delay(1000 / FRAMES_PER_SECOND);
 
 }
 

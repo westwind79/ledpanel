@@ -72,7 +72,7 @@ uint8_t mul2 = 6;
 uint8_t mul3 = 5;
 uint8_t bgcol = 0;                                            // Background colour rotates.
 
-const bool    kMatrixSerpentineLayout = true;
+const bool kMatrixSerpentineLayout = true;
 
 CRGBPalette16 thisPalette;
 CRGBPalette16 thatPalette;
@@ -81,7 +81,6 @@ TBlendType    currentBlending;
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
-#define FRAMES_PER_SECOND  60
 
 extern const TProgmemRGBPalette16 NoahsColors_p FL_PROGMEM = {
 CRGB::Turquoise,
@@ -334,7 +333,7 @@ void fadeAll(byte fadeIncr) {
 // Pick a random palette from a list
 void selectRandomPalette() {
 
-  switch(random8(8)) {
+  switch(random8(19)) {
     case 0:
     currentPalette = CloudColors_p;
     break;
@@ -361,6 +360,50 @@ void selectRandomPalette() {
     
     case 7:
     currentPalette = HeatColors_p;
+    break;
+    
+    case 8:
+    currentPalette = ib_jul01_gp;
+    break;
+    
+    case 9:
+    currentPalette = es_vintage_57_gp;
+    break;
+    
+    case 10:
+    currentPalette = es_vintage_01_gp;
+    break;
+    
+    case 11:
+    currentPalette = es_rivendell_15_gp;
+    break;
+    
+    case 12:
+    currentPalette = rgi_15_gp;
+    break;
+    
+    case 13:
+    currentPalette = es_emerald_dragon_08_gp;
+    break;
+    
+    case 14:
+    currentPalette = Magenta_Evening_gp;
+    break;
+    
+    case 15:
+    currentPalette = Sunset_Real_gp;
+    break;
+    
+    case 16:
+    currentPalette = BlacK_Blue_Magenta_White_gp;
+    break;
+    
+    case 17:
+    currentPalette = BlacK_Magenta_Red_gp;
+    break;
+    
+    case 18:
+    currentPalette = BlacK_Red_Magenta_Yellow_gp;
     break;
    
 //    case 8:
