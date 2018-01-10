@@ -52,20 +52,20 @@ void setup() {
 typedef void (*SimplePatternList[])();
 
 SimplePatternList gPatterns = {
-  starfield,
-  circnoise1,
-  //  circnoise2,
+  
  // fireworks,
   // scrollTextZero,
   // scrollTextOne,
   // scrollTextTwo,
-  
+  barfight,
+  colorPortal, 
+  starfield,
   rider,
+  radiate,
   amazing,
   colorRotation,
   slantBars3,
   // colorwaves,
-  
   slantBars2,
   tungsten,
   overcastSky,
@@ -92,7 +92,6 @@ SimplePatternList gPatterns = {
   colorFill,
   drip,
   sinelon,
-  radiate,
   rainbowStripes,
   fun1,
   rain,

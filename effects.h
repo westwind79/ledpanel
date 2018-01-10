@@ -1,47 +1,3 @@
-uint8_t xd[NUM_LEDS];
-uint8_t yd[NUM_LEDS];
-void circnoise1() {
-
-  uint8_t scale = 210;                               // the "zoom factor" for the noise
-
-  for (uint16_t i = 0; i < NUM_LEDS; i++) {
-
-    uint16_t shift_x = beatsin8(17);                  // the x position of the noise field swings @ 17 bpm
-    uint16_t shift_y = millis() / 100;                // the y position becomes slowly incremented
-
-    uint32_t real_x = (xd[i] + shift_x) * scale;       // calculate the coordinates within the noise field
-    uint32_t real_y = (yd[i] + shift_y) * scale;       // based on the precalculated positions
-
-    uint8_t noise = inoise16(real_x, real_y, 4223) >> 8;           // get the noise data and scale it down
-
-    uint8_t index = noise * 3;                        // map led color based on noise data
-    uint8_t bri   = noise;
-
-    leds[i] = ColorFromPalette(currentPalette, index, bri, LINEARBLEND);   // With that value, look up the 8 bit colour palette value and assign it to the current LED.
-  }
-}
-
-// void circnoise2() {
-
-//   uint8_t scale = 250;                               // the "zoom factor" for the noise
-
-//   for (uint16_t i = 0; i < NUM_LEDS; i++) {
-
-//     uint16_t shift_x = millis() / 10;                 // x as a function of time
-//     uint16_t shift_y = 0;
-
-//     uint32_t real_x = (xd[i] + shift_x) * scale;       // calculate the coordinates within the noise field
-//     uint32_t real_y = (yd[i] + shift_y) * scale;       // based on the precalculated positions
-
-//     uint8_t noise = inoise16(real_x, real_y, 4223) >> 8;           // get the noise data and scale it down
-
-//     uint8_t index = noise * 3;                        // map led color based on noise data
-//     uint8_t bri   = noise;
-
-//     leds[i] = ColorFromPalette(currentPalette, index, bri, LINEARBLEND);   // With that value, look up the 8 bit colour palette value and assign it to the current LED.
-
-//   }
-// }
 #define MAXCHANGES 16
 // Frequency, thus the distance between waves:
 #define MUL1 7
@@ -49,7 +5,7 @@ void circnoise1() {
 #define MUL3 5
 
 void fun1() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -107,6 +63,7 @@ void fun1() {
 }
 
 void starfield() { 
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -135,7 +92,7 @@ void starfield() {
 
 #define rainDir2 1
 void rain() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;    
      FastLED.clear();
@@ -151,7 +108,7 @@ void rain() {
 }
 
 void rainbowStripes() {
-  FastLED.clear();
+
     if (effectInit == false) {
       effectInit = true;
        FastLED.clear();
@@ -166,12 +123,12 @@ void rainbowStripes() {
 }
 
 void radiate() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
      FastLED.clear();
     effectDelay = 45;
-    // selectRandomPalette();
+    selectRandomPalette();
     fadingActive = true;
   }
   static byte offset  = 0;
@@ -194,7 +151,7 @@ void radiate() {
 }
 
 void sinelon(){
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     FastLED.clear();
@@ -209,7 +166,7 @@ void sinelon(){
 }
 
 void juggle() {
-  FastLED.clear();
+  
   if (effectInit == false) {
     effectInit = true;
     FastLED.clear(); 
@@ -227,7 +184,6 @@ void juggle() {
 }
 
 void colorFill() {
-  FastLED.clear();
   static byte currentColor = 0;
   static byte currentRow = 0;
   static byte currentDirection = 0;
@@ -276,7 +232,7 @@ void colorFill() {
 #define COOLING  35
 #define SPARKING 40
 void Fire2012WithPalette() {
-  FastLED.clear();
+
   CRGBPalette16 gPal;
   gPal = HeatColors_p;
 
@@ -320,7 +276,7 @@ void Fire2012WithPalette() {
 }
 
 void snow() {
-  FastLED.clear();
+
   static unsigned int snowCols[kMatrixWidth] = {0};
  
   if (effectInit == false) {
@@ -349,7 +305,7 @@ void snow() {
 }
 
 void drip() {
-  FastLED.clear();
+
   static unsigned int snowCols[kMatrixWidth] = {0};
 
   if (effectInit == false) {
@@ -378,7 +334,7 @@ void drip() {
 }
 
 void confetti() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 45;
@@ -393,13 +349,12 @@ void confetti() {
   }
 }
 
-void rider() {
-  FastLED.clear();
+void rider() { 
   if (effectInit == false) {
     effectInit = true;
-    FastLED.clear();
+    // FastLED.clear();
     effectDelay = 0;
-    currentPalette = RainbowColors_p;
+    //currentPalette = RainbowColors_p;
     fadingActive = true;
   }
 
@@ -409,7 +364,7 @@ void rider() {
     int brightness = abs(y * (256 / kMatrixWidth) - triwave8(riderPos * 2 + 127)) * 3;
     if (brightness > 255) brightness = 255;
     brightness = 255 - brightness;
-    CRGB riderColor = CHSV(gHue, 255, brightness);
+    CRGB riderColor = CHSV(gHue++, 255, brightness);
     for (byte x = 0; x < kMatrixWidth; x++) {
       leds[XY(y, x)] = riderColor;
     }
@@ -418,7 +373,7 @@ void rider() {
 }
 
 void plasma() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     FastLED.clear(); 
@@ -443,7 +398,7 @@ void plasma() {
 }
 
 void plasma2() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     FastLED.clear(); 
@@ -467,7 +422,7 @@ void plasma2() {
 }
 
 void bpm() {
-  FastLED.clear();
+
   bool gReverseDirection = false;
   
   if (effectInit == false) {
@@ -498,7 +453,7 @@ void bpm() {
 }
 
 void radiate2() {
-  FastLED.clear();
+
   static byte offset  = 0;
   static int plasVector = 0;
  
@@ -526,7 +481,7 @@ void radiate2() {
 // Draw slanting bars scrolling across the array, uses current hue
 byte slantPos = 0;
 void slantBars() {
-  FastLED.clear();
+
   // startup tasks
   if (effectInit == false) {
     effectInit = true;
@@ -546,7 +501,7 @@ void slantBars() {
 // Draw slanting bars scrolling across the array, uses current hue
 byte slantPos3 = 1;
 void slantBars3() {
-  FastLED.clear();
+
   // startup tasks
   if (effectInit == false) {
     effectInit = true;
@@ -567,7 +522,7 @@ void slantBars3() {
 // Draw slanting bars scrolling across the array, uses current hue
 byte slantPos2 = 0;
 void slantBars2() {
-  FastLED.clear();
+
   // startup tasks
   if (effectInit == false) {
     effectInit = true;
@@ -586,7 +541,7 @@ void slantBars2() {
 }
 
 void spinPlasma() {
-  FastLED.clear();
+
   static byte offset  = 0;
   static int plasVector = 0;
 
@@ -648,7 +603,7 @@ void spinPlasma() {
 //
 
 void three_sin(){
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -668,7 +623,7 @@ void three_sin(){
   }
 } // three_sin()
 void three_sinVert(){
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -689,8 +644,7 @@ void three_sinVert(){
 } // three_sin()
 
 
-void crazy2() { 
-  FastLED.clear();
+void crazy2() {
 
   if (effectInit == false) {
     effectInit = true;
@@ -711,7 +665,7 @@ void crazy2() {
 } 
 
 void colorRotation() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
@@ -733,7 +687,7 @@ void colorRotation() {
 }
 
 void vertThreeSine() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -761,7 +715,7 @@ void vertThreeSine() {
 }
 
 void threeSine() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -790,7 +744,7 @@ void threeSine() {
 
 uint8_t angle = 16;
 void amazing() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 10;
@@ -811,7 +765,7 @@ void amazing() {
 }
 
 void blendme() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -833,7 +787,7 @@ uint32_t xscale = 2;                                          // How far apart t
 uint32_t yscale = 100;                                           // How fast they move
 uint8_t index1 = 0;
 void inoise8_fire() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -853,6 +807,7 @@ void inoise8_fire() {
 unsigned long previousMillis; // Store last time the strip was updated.
  
 void two_sin() {
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -878,6 +833,7 @@ void two_sin() {
 } // two_sin()
 
 void twoSin() {
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -897,7 +853,7 @@ void twoSin() {
 }
 
 void ripple() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -936,7 +892,7 @@ void ripple() {
 } // ripple()
 
 void serendipitous () {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -977,7 +933,7 @@ void serendipitous () {
 
 
 void amazingNoise() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -1000,7 +956,7 @@ void amazingNoise() {
 
 
 void colorSnake() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -1042,7 +998,7 @@ void colorSnake() {
 
 #define TEMPERATURE_1 Tungsten100W
 void tungsten() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -1061,7 +1017,7 @@ void tungsten() {
 
 #define TEMPERATURE_2 OvercastSky
 void overcastSky() {
-  FastLED.clear();
+
   if (effectInit == false) {
     effectInit = true;
     effectDelay = 0;
@@ -1157,4 +1113,67 @@ void scrollTextOne() {
 
 void scrollTextTwo() {
   scrollText(2, NORMAL, CRGB::Green, CRGB(0,0,8));
+}
+
+void barfight() {
+
+  static byte barpos[16];
+  
+  // startup tasks
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 50;
+    for (byte i = 0; i < kMatrixWidth; i++) {
+      barpos[i] = random8(0,8);
+    }
+  }
+
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    for (byte y = 0; y < kMatrixHeight; y++) {
+      if (y < barpos[x]) {
+        // leds[XY(x,y)] = CHSV(cycleHue, 255, 255);
+        leds[XY(x,y)] = CRGB::Red;
+        //leds[XY(x,y)] = CRGB::DarkMagenta;
+      } else {
+        // leds[XY(x,y)] = CRGB(0,128,0);
+        leds[XY(x,y)] = CRGB::Yellow;
+      }
+    }
+
+    byte tempIncr = random(0,6);
+    if (barpos[x] > 0 && tempIncr == 0) barpos[x]--;
+    if (barpos[x] < 16 && tempIncr == 2) barpos[x]++;
+
+    
+  }
+
+}
+
+void colorPortal() {
+  static byte offset  = 0; // counter for radial color wave motion
+  static int plasVector = 0; // counter for orbiting plasma center
+
+  currentPalette = es_emerald_dragon_08_gp;
+  // startup tasks
+  
+  if (effectInit == false) {
+    effectInit = true;
+    effectDelay = 10;
+    FastLED.clear();
+  //  currentPalette = es_emerald_dragon_08_gp;
+    fadingActive = true;
+  }
+
+  int xOffset = 247;
+  int yOffset = 122;
+
+  // Draw one frame of the animation into the LED array
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      byte color = sin8(sqrt(sq(((float)x) * 16 - xOffset) + sq(((float)y) * 16 - yOffset)) + offset);
+      leds[XY(x, y)] = ColorFromPalette(currentPalette, color, 255);
+    }
+  }
+  offset++; // wraps at 255 for sin8
+  plasVector += 1; // using an int for slower orbit (wraps at 65536)
 }
